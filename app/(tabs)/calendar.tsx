@@ -30,6 +30,8 @@ const CalendarScreen = () => {
   const [selectedDate, setSelectedDate] = useState(today);
 
   const environmentalData = dumpData[selectedDate];
+  // Format selected date to a more human-friendly format.
+  const formattedDate = dayjs(selectedDate).format("MMMM D, YYYY");
 
   return (
     <ScrollView style={styles.container}>
@@ -58,14 +60,27 @@ const CalendarScreen = () => {
       <View style={styles.dataContainer}>
         {environmentalData ? (
           <View style={styles.dataCard}>
-            <Text style={styles.dataTitle}>Data for {selectedDate}</Text>
-            <Text style={styles.dataText}>Temperature: {environmentalData.Temperature}</Text>
-            <Text style={styles.dataText}>Humidity: {environmentalData.Humidity}</Text>
-            <Text style={styles.dataText}>pH: {environmentalData.pH}</Text>
-            <Text style={styles.dataText}>EC: {environmentalData.EC}</Text>
+            <Text style={styles.dataTitle}>Reports from {formattedDate} 📢</Text>
+            <View style={styles.divider} />
+            <View style={styles.dataRow}>
+              <Text style={styles.dataText}>🌡️ Temperature: {environmentalData.Temperature}</Text>
+            </View>
+            <View style={styles.divider} />
+            <View style={styles.dataRow}>
+              <Text style={styles.dataText}>💧 Humidity: {environmentalData.Humidity}</Text>
+            </View>
+            <View style={styles.divider} />
+            <View style={styles.dataRow}>
+              <Text style={styles.dataText}>🧪 pH: {environmentalData.pH}</Text>
+            </View>
+            <View style={styles.divider} />
+            <View style={styles.dataRow}>
+              <Text style={styles.dataText}>🔌 EC: {environmentalData.EC}</Text>
+            </View>
+            <View style={styles.divider} />
           </View>
         ) : (
-          <Text style={styles.noDataText}>No data available for {selectedDate}</Text>
+          <Text style={styles.noDataText}>No data available for {formattedDate}</Text>
         )}
       </View>
     </ScrollView>
@@ -108,13 +123,21 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   dataTitle: {
-    fontSize: 18,
+    fontSize: 19,
     fontWeight: "bold",
-    marginBottom: 10,
+    marginBottom: 13,
+  },
+  dataRow: {
+    paddingVertical: 5,
   },
   dataText: {
     fontSize: 16,
     marginBottom: 5,
+  },
+  divider: {
+    borderBottomColor: "gray",
+    borderBottomWidth: 1,
+    marginVertical: 5,
   },
   noDataText: {
     fontSize: 16,
