@@ -29,7 +29,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="speedometer" color={color} />,
         }}
       />
-      {/*<Tabs.Screen
+      <Tabs.Screen
         name="calendar"
         options={{
           title: 'Calendar',
@@ -49,7 +49,7 @@ export default function TabLayout() {
           title: 'Camera',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="camera" color={color} />,
         }}
-      />*/}
+      />
     </Tabs>
     
   );
