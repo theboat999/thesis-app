@@ -1,33 +1,72 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { Calendar } from 'react-native-calendars';
+import dayjs from 'dayjs';
+
+const dumpData = {
+  "2025-02-15": {
+    Temperature: "22°C",
+    Humidity: "45%",
+    pH: "6.7",
+    EC: "140 µS/cm",
+  },
+  "2025-02-16": {
+    Temperature: "25°C",
+    Humidity: "40%",
+    pH: "6.8",
+    EC: "150 µS/cm",
+  },
+  "2025-02-17": {
+    Temperature: "23°C",
+    Humidity: "42%",
+    pH: "6.9",
+    EC: "145 µS/cm",
+  },
+};
 
 const CalendarScreen = () => {
-  const [selectedDate, setSelectedDate] = useState('');
+  // Automatically set today's date in "YYYY-MM-DD" format.
+  const today = dayjs().format('YYYY-MM-DD');
+  const [selectedDate, setSelectedDate] = useState(today);
+
+  const environmentalData = dumpData[selectedDate];
 
   return (
     <ScrollView style={styles.container}>
-      {/* Header (copied from Dashboard) */}
+      {/* Header (unchanged from Dashboard) */}
       <View style={styles.header}>
         <Text style={styles.title}>POMODAERO 🌱</Text>
-        <Text style={styles.subtitle}>Calendar</Text>
+        <Text style={styles.subtitle}>Dashboard</Text>
       </View>
 
+      {/* Calendar */}
       <View style={styles.calendarContainer}>
         <Calendar
           onDayPress={(day) => setSelectedDate(day.dateString)}
           markedDates={{
-            [selectedDate]: { selected: true, marked: true, selectedColor: 'blue' },
+            [selectedDate]: { selected: true, marked: true, selectedColor: '#4CAF50' },
           }}
           theme={{
             todayTextColor: 'red',
-            selectedDayBackgroundColor: 'blue',
-            arrowColor: 'blue',
+            selectedDayBackgroundColor: '#4CAF50',
+            arrowColor: 'black',
           }}
         />
-        {selectedDate ? (
-          <Text style={styles.text}>Selected Date: {selectedDate}</Text>
-        ) : null}
+      </View>
+
+      {/* Data Display */}
+      <View style={styles.dataContainer}>
+        {environmentalData ? (
+          <View style={styles.dataCard}>
+            <Text style={styles.dataTitle}>Data for {selectedDate}</Text>
+            <Text style={styles.dataText}>Temperature: {environmentalData.Temperature}</Text>
+            <Text style={styles.dataText}>Humidity: {environmentalData.Humidity}</Text>
+            <Text style={styles.dataText}>pH: {environmentalData.pH}</Text>
+            <Text style={styles.dataText}>EC: {environmentalData.EC}</Text>
+          </View>
+        ) : (
+          <Text style={styles.noDataText}>No data available for {selectedDate}</Text>
+        )}
       </View>
     </ScrollView>
   );
@@ -54,14 +93,34 @@ const styles = StyleSheet.create({
   },
   calendarContainer: {
     marginTop: 20,
-    flex: 1,
-    padding: 20,
+    marginHorizontal: 20,
     backgroundColor: "#fff",
+    borderRadius: 15,
+    overflow: 'hidden',
   },
-  text: {
+  dataContainer: {
     marginTop: 20,
+    marginHorizontal: 20,
+  },
+  dataCard: {
+    backgroundColor: "#FFFFFD",
+    borderRadius: 15,
+    padding: 20,
+  },
+  dataTitle: {
     fontSize: 18,
-    textAlign: 'center',
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  dataText: {
+    fontSize: 16,
+    marginBottom: 5,
+  },
+  noDataText: {
+    fontSize: 16,
+    textAlign: "center",
+    marginTop: 20,
+    color: "gray",
   },
 });
 
