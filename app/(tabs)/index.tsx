@@ -97,7 +97,7 @@ const Dashboard = () => {
     <ScrollView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.title}>POMOD-AERO 🌱</Text>
+        <Text style={styles.title}>POMODAERO 🌱</Text>
         <Text style={styles.subtitle}>Dashboard</Text>
       </View>
 
