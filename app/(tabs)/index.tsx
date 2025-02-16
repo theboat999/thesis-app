@@ -1,42 +1,97 @@
-import React from "react";
-import { View, Text, StyleSheet, ScrollView } from "react-native";
+import React, { useState } from "react";
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
 import { LineChart } from "react-native-chart-kit";
+import Modal from "react-native-modal"; // Import the modal
 
 const StatusIndicator = ({ status }) => {
   return (
     <View style={styles.statusContainer}>
-      {/* Bad (Red) */}
-      <View
-        style={[
-          styles.statusCircle,
-          { backgroundColor: "#E74C3C" },
-          status === "Bad" && styles.activeStatus,
-        ]}
-      />
-      
-      {/* Okay (Orange) */}
-      <View
-        style={[
-          styles.statusCircle,
-          { backgroundColor: "#F39C12" },
-          status === "Okay" && styles.activeStatus,
-        ]}
-      />
-      
-      {/* Great (Green) */}
-      <View
-        style={[
-          styles.statusCircle,
-          { backgroundColor: "#27AE60" },
-          status === "Great" && styles.activeStatus,
-        ]}
-      />
+      {/* Status Circles (horizontally aligned) */}
+      <View style={styles.circleContainer}>
+        {/* Bad (Red) */}
+        <View
+          style={[
+            styles.statusCircle,
+            { backgroundColor: "#E74C3C" },
+            status === "Bad" && styles.activeStatus,
+          ]}
+        />
+        {/* Okay (Orange) */}
+        <View
+          style={[
+            styles.statusCircle,
+            { backgroundColor: "#F39C12" },
+            status === "Okay" && styles.activeStatus,
+          ]}
+        />
+        {/* Great (Green) */}
+        <View
+          style={[
+            styles.statusCircle,
+            { backgroundColor: "#27AE60" },
+            status === "Great" && styles.activeStatus,
+          ]}
+        />
+      </View>
     </View>
   );
 };
 
+// Helper function to get color for the current status text
+const getStatusColor = (status) => {
+  if (status === "Bad") return "#E74C3C";
+  if (status === "Okay") return "#F39C12";
+  if (status === "Great") return "#27AE60";
+  return "#000";
+};
+
 const Dashboard = () => {
-  const currentStatus = "Okay"; // Change this to "Bad" or "Great" for testing
+  // Mapping data for each metric
+  const metricData = {
+    Temperature: {
+      currentStatus: "Okay",
+      chart: {
+        labels: ["6:00", "9:00", "12:00", "15:00", "18:00"],
+        data: [10, 5, 15, 20, 25],
+        yAxisSuffix: "°C",
+      },
+    },
+    pH: {
+      currentStatus: "Great",
+      chart: {
+        labels: ["6:00", "9:00", "12:00", "15:00", "18:00"],
+        data: [6.5, 6.7, 6.8, 6.6, 6.7],
+        yAxisSuffix: "",
+      },
+    },
+    Humidity: {
+      currentStatus: "Bad",
+      chart: {
+        labels: ["6:00", "9:00", "12:00", "15:00", "18:00"],
+        data: [30, 35, 40, 38, 36],
+        yAxisSuffix: "%",
+      },
+    },
+    EC: {
+      currentStatus: "Okay",
+      chart: {
+        labels: ["6:00", "9:00", "12:00", "15:00", "18:00"],
+        data: [150, 160, 155, 170, 165],
+        yAxisSuffix: "µS/cm",
+      },
+    },
+  };
+
+  const [selectedMetric, setSelectedMetric] = useState("Temperature"); // Default metric
+  const [isModalVisible, setModalVisible] = useState(false); // Modal visibility toggle
+
+  // Get current metric details
+  const currentMetricData = metricData[selectedMetric];
+
+  // Function to toggle modal
+  const toggleModal = () => {
+    setModalVisible(!isModalVisible);
+  };
 
   return (
     <ScrollView style={styles.container}>
@@ -49,22 +104,60 @@ const Dashboard = () => {
       {/* Status Card */}
       <View style={styles.card}>
         <Text style={styles.statusText}>
-          CURRENT STATUS: <Text style={styles.statusCurrent}>{currentStatus}</Text>
+          CURRENT STATUS:{" "}
+          <Text
+            style={[
+              styles.statusCurrent,
+              { color: getStatusColor(currentMetricData.currentStatus) },
+            ]}
+          >
+            {currentMetricData.currentStatus}
+          </Text>
         </Text>
 
         {/* Status Indicator */}
-        <StatusIndicator status={currentStatus} />
+        <StatusIndicator status={currentMetricData.currentStatus} />
 
-        {/* Temperature Graph */}
+        {/* Dropdown for Metric */}
+        <View style={styles.dropdownContainer}>
+          <TouchableOpacity
+            style={styles.dropdownButton}
+            onPress={toggleModal} // Toggle modal visibility
+          >
+            <Text style={styles.dropdownLabel}>
+              {selectedMetric} ▼
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Modal for Metric Picker */}
+        <Modal isVisible={isModalVisible} onBackdropPress={toggleModal}>
+          <View style={styles.modalContent}>
+            {["Temperature", "EC", "pH", "Humidity"].map((metric) => (
+              <TouchableOpacity
+                key={metric}
+                style={styles.modalButton}
+                onPress={() => {
+                  setSelectedMetric(metric);
+                  toggleModal();
+                }}
+              >
+                <Text style={styles.modalText}>{metric}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </Modal>
+
+        {/* Chart for selected metric */}
         <View style={styles.chartContainer}>
           <LineChart
             data={{
-              labels: ["6:00", "9:00", "12:00", "15:00", "18:00"],
-              datasets: [{ data: [10, 5, 15, 20, 25] }],
+              labels: currentMetricData.chart.labels,
+              datasets: [{ data: currentMetricData.chart.data }],
             }}
             width={320}
             height={200}
-            yAxisSuffix="°C"
+            yAxisSuffix={currentMetricData.chart.yAxisSuffix}
             chartConfig={{
               backgroundGradientFrom: "#fff",
               backgroundGradientTo: "#fff",
@@ -84,14 +177,16 @@ const Dashboard = () => {
         <Text style={styles.reportTitle}>Today's Report 📢</Text>
         <View style={styles.reportItem}>
           <Text style={styles.reportTime}>Morning 🌅</Text>
-          <Text style={styles.reportText}>Humidity low, needs adjustments</Text>
+          <Text style={styles.reportText}>
+            Humidity low, needs adjustments
+          </Text>
         </View>
         <View style={styles.reportItem}>
           <Text style={styles.reportTime}>Afternoon ☁️</Text>
           <Text style={styles.reportText}>pH level stable</Text>
         </View>
         <View style={styles.reportItem}>
-          <Text style={styles.reportTime}>Morning 🌙</Text>
+          <Text style={styles.reportTime}>Evening 🌙</Text>
           <Text style={styles.reportText}>Temperature within range</Text>
         </View>
       </View>
@@ -134,13 +229,18 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   statusCurrent: {
-    color: "#F39C12",
+    fontWeight: "bold",
   },
   statusContainer: {
-    flexDirection: "row",
+    flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
     marginVertical: 10,
+  },
+  circleContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 5,
   },
   statusCircle: {
     width: 20,
@@ -156,6 +256,37 @@ const styles = StyleSheet.create({
     opacity: 1,
     borderWidth: 2,
     borderColor: "#000",
+  },
+  dropdownContainer: {
+    marginVertical: 20,
+    alignItems: "center",
+  },
+  dropdownButton: {
+    padding: 10,
+    borderRadius: 5,
+    backgroundColor: "#FFF",
+    borderWidth: 1,
+    borderColor: "#ccc",
+  },
+  dropdownLabel: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#333",
+  },
+  modalContent: {
+    backgroundColor: "#fff",
+    padding: 20,
+    borderRadius: 10,
+  },
+  modalButton: {
+    padding: 15,
+    borderRadius: 5,
+    marginVertical: 5,
+    backgroundColor: "#f0f0f0",
+  },
+  modalText: {
+    fontSize: 16,
+    color: "#333",
   },
   chartContainer: {
     alignItems: "center",
@@ -195,8 +326,8 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   reportText: {
-    fontSize: 13,
-    color: "#555",
+    fontSize: 12,
+    color: "gray",
   },
 });
 
