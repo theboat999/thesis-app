@@ -38,7 +38,7 @@ const CalendarScreen = () => {
       {/* Header (unchanged from Dashboard) */}
       <View style={styles.header}>
         <Text style={styles.title}>POMODAERO 🌱</Text>
-        <Text style={styles.subtitle}>Dashboard</Text>
+        <Text style={styles.subtitle}>Calendar</Text>
       </View>
 
       {/* Calendar */}
@@ -60,7 +60,7 @@ const CalendarScreen = () => {
       <View style={styles.dataContainer}>
         {environmentalData ? (
           <View style={styles.dataCard}>
-            <Text style={styles.dataTitle}>Reports from {formattedDate} 📢</Text>
+            <Text style={styles.dataTitle}>{formattedDate} 📢</Text>
             <View style={styles.divider} />
             <View style={styles.dataRow}>
               <Text style={styles.dataText}>🌡️ Temperature: {environmentalData.Temperature}</Text>
@@ -121,6 +121,13 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFD",
     borderRadius: 15,
     padding: 20,
+    // Added shadow for iOS
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    // Added elevation for Android
+    elevation: 5,
   },
   dataTitle: {
     fontSize: 19,
@@ -135,7 +142,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   divider: {
-    borderBottomColor: "gray",
+    borderBottomColor: "#ddd",
     borderBottomWidth: 1,
     marginVertical: 5,
   },
@@ -143,7 +150,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: "center",
     marginTop: 20,
-    color: "gray",
+    color: "#ddd",
   },
 });
 
